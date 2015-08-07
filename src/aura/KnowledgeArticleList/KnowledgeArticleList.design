@@ -1,0 +1,3 @@
+<design:component label="Knowledge Articles">
+    <design:attribute name="title" label="List Title" description="Title you want to display for this Knowledge Article List"/>
+</design:component>

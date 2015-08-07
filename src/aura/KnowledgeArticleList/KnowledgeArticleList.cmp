@@ -1,0 +1,24 @@
+<aura:component controller="KnowledgeArticleListCtrl" implements="flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="articles" type="KnowledgeArticleItem[]"/>
+    <aura:attribute name="title" type="String" default="Knowledge Articles" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <div class="kalist-container">
+
+        <div class="kalist-header">
+            <div class="kalist-header-body">
+                <h3>{!v.title}</h3>
+            </div>
+
+        </div>
+
+        <div>
+            <aura:iteration items="{!v.articles}" var="a">
+                <a href="#" onclick="{!c.goToRecord}" class="object-title" data-articleid="{!a.Id}">{!a.Title} - {!a.Rating}</a>
+            </aura:iteration>
+        </div>
+    </div>
+
+</aura:component>
