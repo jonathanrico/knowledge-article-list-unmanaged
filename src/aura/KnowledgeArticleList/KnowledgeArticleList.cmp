@@ -16,7 +16,27 @@
 
         <div>
             <aura:iteration items="{!v.articles}" var="a">
-                <a href="#" onclick="{!c.goToRecord}" class="object-title" data-articleid="{!a.Id}">{!a.Title} - {!a.Rating}</a>
+                <div class="article-item-container">
+                  <a href="javascript:void();" onclick="{!c.goToRecord}" class="object-title" data-articleid="{!a.Id}">
+                    <div class="article-item-title">
+                      {!a.Title}
+                    </div>
+
+                    <ul class="itemRows">
+                        <li class="tableRowGroup">
+                            <div class="forceListRecordItem">
+                                <div class="label">Rating:</div>
+                                <div class="value">
+                                    <div class="rating_bar">
+                                        <div class="rating" style="{!'width:'+a.Rating+'%;'}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                  </a>
+                </div>
             </aura:iteration>
         </div>
     </div>

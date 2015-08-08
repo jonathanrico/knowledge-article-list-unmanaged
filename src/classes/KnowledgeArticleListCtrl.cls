@@ -29,7 +29,7 @@ public with sharing class KnowledgeArticleListCtrl{
                                     where ParentId in :kavMap.keySet()]){
 
             if(v.NormalizedScore != null){
-              kavMap.get(v.ParentId).Rating = (v.NormalizedScore).intValue();
+              kavMap.get(v.ParentId).Rating = ((v.NormalizedScore/5.0)*100.0).intValue();
             }
         }
 

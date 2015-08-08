@@ -1,7 +1,7 @@
 .THIS.kalist-container{
     border-radius:5px;
     margin: 15px;
-    padding: 10px;
+    padding: 0px;
     border: 0;
     background-color:#fff;
 }
@@ -17,16 +17,16 @@
 }
 
 .THIS .kalist-header-body{
-    text-align:center;
     max-width: 38rem;
-    padding:0 20px;
     margin: 0 auto;
 }
 
 .THIS .kalist-header-body h3{
-    color:#000;
-    margin:0;
-    padding: 10px 0 0 0;
+    padding: 14px;
+    color: #3c3d3e;
+    font-size: 1rem;
+    font-family: 'ProximaNovaSoft-Regular';
+    border-bottom: 1px solid #f5f6f7;
 }
 
 .THIS .kalist-container{
@@ -40,4 +40,81 @@
     width:auto;
     max-width: 100%;
     border-radius:10px;
+}
+
+.THIS .rating_bar {
+    /*this class creats 5 stars bar with empty stars */
+    /*each star is 16 px, it means 5 stars will make 80px together */
+    width: 80px;
+    /*height of empty star*/
+    height: 16px;
+    /*background image with stars */
+    background: url(/resource/KnowledgeArticleListResources/img/stars.png);
+    /*which will be repeated horizontally */
+    background-repeat: repeat-x;
+    /* as we are using sprite image, we need to position it to use right star,
+    //0 0 is for empty */
+    background-position: 0 0;
+    /* align inner div to the left */
+    text-align: left;
+}
+
+.THIS .rating {
+    /* height of full star is the same, we won't specify width here */
+    height: 16px;
+    /* background image with stars */
+    background: url(/resource/KnowledgeArticleListResources/img/stars.png);
+    /* now we will position background image to use 16px from top,
+    //which means use full stars */
+    background-position: 0 -16px;
+    /* and repeat them horizontally */
+    background-repeat: repeat-x;
+}
+
+.THIS .article-item-container{
+    background-color: #ffffff;
+    border-bottom: 1px solid #f5f6f7;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: .9375rem;
+}
+
+.THIS .article-item-container a{
+    display: block;
+    background: transparent;
+    text-decoration: none;
+}
+
+.THIS .article-item-title{
+    color: #3c3d3e;
+    font-size: 1rem;
+    font-family: 'ProximaNovaSoft-Regular';
+    padding-bottom: 3px;
+}
+
+.THIS .itemRows{
+    color: #3c3d3e;
+    font-size: .875rem;
+    font-family: 'ProximaNovaSoft-Regular';
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.THIS .tableRowGroup{
+    list-style: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+}
+
+.THIS .tableRowGroup div{
+    padding: 0px 14px 0px 0;
+    line-height: 1rem;
+}
+
+.THIS .tableRowGroup div.label{
+    color: #686c70;
 }
