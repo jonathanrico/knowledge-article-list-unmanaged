@@ -11,17 +11,14 @@
             <div class="kalist-header-body">
                 <h3>{!v.title}</h3>
             </div>
-
         </div>
 
         <div>
             <aura:iteration items="{!v.articles}" var="a">
                 <div class="article-item-container">
-                  <a href="javascript:void();" onclick="{!c.goToRecord}" class="object-title" data-articleid="{!a.Id}">
-                    <div class="article-item-title">
+                    <div class="article-item-title" onclick="{!c.goToRecord}" data-articleid="{!a.Id}">
                       {!a.Title}
                     </div>
-
                     <ul class="itemRows">
                         <li class="tableRowGroup">
                             <div class="forceListRecordItem">
@@ -34,8 +31,6 @@
                             </div>
                         </li>
                     </ul>
-
-                  </a>
                 </div>
             </aura:iteration>
         </div>
