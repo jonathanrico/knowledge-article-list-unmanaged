@@ -1,10 +1,15 @@
 ({
 
     getRecords : function(component){
+        var maxresults = isNaN(component.get("v.maxresults"))? 10 : parseInt(component.get("v.maxresults"));
         var a = component.get("c.getRecords");
-        a.setCallback(this, function(action) {
-            if (action.getState() === "SUCCESS") {
-                component.set('v.articles',action.getReturnValue());
+        a.setParams({
+          "maxResults": maxresults,
+          "articleType": "How_To"
+        });
+        a.setCallback(this, function(response) {
+            if (response.getState() === "SUCCESS") {
+                component.set('v.articles',response.getReturnValue());
             } else {
                 alert('Unable to fetch article records');
             }

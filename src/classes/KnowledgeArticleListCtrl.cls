@@ -1,35 +1,32 @@
 public with sharing class KnowledgeArticleListCtrl{
 
     @AuraEnabled
-    public static List<KnowledgeArticleItem> getRecords(){
+    public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType){
+
+        Integer mxr = Integer.valueOf(maxResults);
         List<KnowledgeArticleItem> results = new List<KnowledgeArticleItem>();
         List<Id> sortedIds = new List<Id>();
         Map<Id,KnowledgeArticleItem> kavMap = new Map<Id,KnowledgeArticleItem>();
 
-        for(How_To__kav a : [select Id
-                                    ,Title
-                                    ,KnowledgeArticleId
-                                    ,ArticleType
-                                    from How_To__kav
-                                    where PublishStatus='online'
-                                    and language ='en_US'
-                                    limit 10]){
+        String soql = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav';
+        soql+= ' where PublishStatus=\'online\' and language = \'en_US\' limit :mxr';
+
+        for(Sobject a : Database.query(soql)){
             KnowledgeArticleItem kai = new KnowledgeArticleItem();
             kai.Id = a.Id;
-            kai.Title = a.Title;
+            kai.Title = (String)a.get('Title');
             kai.Rating = 0;
-            sortedIds.add(a.KnowledgeArticleId);
-            kavMap.put(a.KnowledgeArticleId, kai);
+            sortedIds.add((String)a.get('KnowledgeArticleId'));
+            kavMap.put((String)a.get('KnowledgeArticleId'), kai);
         }
 
-        for(How_To__VoteStat v : [select Id
-                                    ,ParentId
-                                    ,NormalizedScore
-                                    from How_To__VoteStat
-                                    where ParentId in :kavMap.keySet()]){
+        Set<Id> parentIdsSet = kavMap.keySet();
+        String soqlVoteStats = 'select Id,ParentId,NormalizedScore from '+articleType+'__VoteStat';
+        soqlVoteStats+= ' where ParentId in :parentIdsSet';
 
-            if(v.NormalizedScore != null){
-              kavMap.get(v.ParentId).Rating = ((v.NormalizedScore/5.0)*100.0).intValue();
+        for(Sobject v : Database.query(soqlVoteStats)){
+            if(v.get('NormalizedScore') != null){
+              kavMap.get((String)v.get('ParentId')).Rating = ((((Decimal)v.get('NormalizedScore'))/5.0)*100.0).intValue();
             }
         }
 

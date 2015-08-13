@@ -1,3 +1,4 @@
 <design:component label="Knowledge Articles">
     <design:attribute name="title" label="List Title" description="Title you want to display for this Knowledge Article List"/>
+    <design:attribute name="maxresults" label="Max Results" description="Max # of articles displayed in the component"/>
 </design:component>
