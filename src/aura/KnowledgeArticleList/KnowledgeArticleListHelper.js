@@ -2,10 +2,11 @@
 
     getRecords : function(component){
         var maxresults = isNaN(component.get("v.maxresults"))? 10 : parseInt(component.get("v.maxresults"));
+        var articletype = component.get("v.articletype");
         var a = component.get("c.getRecords");
         a.setParams({
           "maxResults": maxresults,
-          "articleType": "How_To"
+          "articleType": articletype
         });
         a.setCallback(this, function(response) {
             if (response.getState() === "SUCCESS") {
