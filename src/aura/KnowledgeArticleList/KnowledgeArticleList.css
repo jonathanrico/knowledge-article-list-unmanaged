@@ -25,8 +25,9 @@
     padding: 14px;
     color: #3c3d3e;
     font-size: 1rem;
-    font-family: 'ProximaNovaSoft-Regular';
+    font-family: 'ProximaNovaSoft-Regular','Arial';
     border-bottom: 1px solid #f5f6f7;
+    margin: 0;
 }
 
 .THIS .kalist-container{
@@ -91,14 +92,14 @@
 .THIS .article-item-title{
     color: #3c3d3e;
     font-size: 1rem;
-    font-family: 'ProximaNovaSoft-Regular';
+    font-family: 'ProximaNovaSoft-Regular','Arial';
     padding-bottom: 3px;
 }
 
 .THIS .itemRows{
     color: #3c3d3e;
     font-size: .875rem;
-    font-family: 'ProximaNovaSoft-Regular';
+    font-family: 'ProximaNovaSoft-Regular','Arial';
     list-style: none;
     margin: 0;
     padding: 0;
