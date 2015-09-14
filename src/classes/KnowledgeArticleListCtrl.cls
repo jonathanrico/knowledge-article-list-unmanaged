@@ -23,7 +23,7 @@ public with sharing class KnowledgeArticleListCtrl{
 
           Set<Id> parentIdsSet = kavMap.keySet();
           String soqlVoteStats = 'select Id,ParentId,NormalizedScore from '+articleType+'__VoteStat';
-          soqlVoteStats+= ' where ParentId in :parentIdsSet';
+          soqlVoteStats+= ' where ParentId in :parentIdsSet and Channel = \'AllChannels\'';
 
           for(Sobject v : Database.query(soqlVoteStats)){
               if(v.get('NormalizedScore') != null){
