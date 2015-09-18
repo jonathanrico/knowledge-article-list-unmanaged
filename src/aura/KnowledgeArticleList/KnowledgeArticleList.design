@@ -1,5 +1,5 @@
 <design:component label="Knowledge Articles">
     <design:attribute name="title" label="List Title" description="Title you want to display for this Knowledge Article List"/>
     <design:attribute name="maxresults" label="Max Results" description="Max # of articles displayed in the component"/>
-    <design:attribute name="articletype" label="Article Type" datasource="FAQ,How_To,Order_Support,Technical,Alert,Community_Article" />
+    <design:attribute name="articletype" label="Article Type" description="API Name of your article type" />
 </design:component>
