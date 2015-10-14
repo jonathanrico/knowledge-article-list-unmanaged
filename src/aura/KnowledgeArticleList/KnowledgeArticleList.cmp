@@ -1,6 +1,6 @@
-<aura:component controller="KnowledgeArticleListCtrl" implements="flexipage:availableForAllPageTypes">
+<aura:component controller="ltngka.KnowledgeArticleListCtrl" implements="flexipage:availableForAllPageTypes">
 
-    <aura:attribute name="articles" type="KnowledgeArticleItem[]"/>
+    <aura:attribute name="articles" type="ltngka.KnowledgeArticleItem[]"/>
     <aura:attribute name="title" type="String" default="Knowledge Articles" />
     <aura:attribute name="maxresults" type="Integer" default="10" />
     <aura:attribute name="articletype" type="String" default="How_To" />
