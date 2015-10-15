@@ -1,27 +1,53 @@
 public with sharing class KnowledgeArticleListCtrl{
 
     @AuraEnabled
-    public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType){
+    public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType, String sortByType){
 
-        Integer mxr = Integer.valueOf(maxResults);
         List<KnowledgeArticleItem> results = new List<KnowledgeArticleItem>();
+        Integer mxr = Integer.valueOf(maxResults);
         List<Id> sortedIds = new List<Id>();
         Map<Id,KnowledgeArticleItem> kavMap = new Map<Id,KnowledgeArticleItem>();
-
-        String soql = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav';
-        soql+= ' where PublishStatus=\'online\' and language = \'en_US\' limit :mxr';
 
         try{
 
           if(!Test.isRunningTest()){
-            for(Sobject a : Database.query(soql)){
+
+            //Get ka ids sorted by normalized score
+            String statObject = sortByType=='Views'?'ViewStat':'VoteStat';
+
+            String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject;
+            soqlVoteStats+= ' where Channel = \'AllChannels\' order by NormalizedScore desc limit :mxr';
+
+            for(Sobject v : Database.query(soqlVoteStats)){
+                Id kaId = (Id)v.get('ParentId');
+                sortedIds.add(kaId);
                 KnowledgeArticleItem kai = new KnowledgeArticleItem();
+                kai.kaId = kaId;
+                Integer articleRating = 0;
+                if(v.get('NormalizedScore') != null){
+                  System.debug('**** NS : '+v.get('NormalizedScore'));
+                  if(statObject == 'VoteStat'){
+                    articleRating = ((((Decimal)v.get('NormalizedScore'))/5.0)*100.0).intValue();
+                  }else{
+                    articleRating = ((Decimal)v.get('NormalizedScore')).intValue();
+                  }
+                }
+
+                System.debug('**** AR : '+articleRating);
+                kai.Rating = articleRating;
+                kavMap.put(kaId, kai);
+            }
+
+            String soql = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav';
+            soql+= ' where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
+
+            for(Sobject a : Database.query(soql)){
+                Id kaId = (String)a.get('KnowledgeArticleId');
+                KnowledgeArticleItem kai = kavMap.get(kaId);
                 kai.Id = a.Id;
                 kai.Title = (String)a.get('Title');
-                kai.Rating = 0;
-                sortedIds.add((String)a.get('KnowledgeArticleId'));
-                kavMap.put((String)a.get('KnowledgeArticleId'), kai);
             }
+
           }else{
                 KnowledgeArticleItem kai1 = new KnowledgeArticleItem();
                 kai1.Id = 'kA061000000M55d';
@@ -49,24 +75,12 @@ public with sharing class KnowledgeArticleListCtrl{
                 kavMap.put('kA161000000M55g', kai4);
           }
 
-          Set<Id> parentIdsSet = kavMap.keySet();
-
-          if(!Test.isRunningTest()){
-              String soqlVoteStats = 'select Id,ParentId,NormalizedScore from '+articleType+'__VoteStat';
-              soqlVoteStats+= ' where ParentId in :parentIdsSet and Channel = \'AllChannels\'';
-
-              for(Sobject v : Database.query(soqlVoteStats)){
-                  if(v.get('NormalizedScore') != null){
-                    kavMap.get((String)v.get('ParentId')).Rating = ((((Decimal)v.get('NormalizedScore'))/5.0)*100.0).intValue();
-                  }
-              }
-          }
-
           for(Id kavId : sortedIds){
             results.add(kavMap.get(kavId));
           }
+
         }catch(Exception e){
-          //TODO : Return a nice exception in here
+          System.debug(e);
         }
         return results;
     }

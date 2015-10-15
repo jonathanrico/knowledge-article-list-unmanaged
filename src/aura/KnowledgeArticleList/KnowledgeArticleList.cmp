@@ -3,7 +3,8 @@
     <aura:attribute name="articles" type="ltngka.KnowledgeArticleItem[]"/>
     <aura:attribute name="title" type="String" default="Knowledge Articles" />
     <aura:attribute name="maxresults" type="Integer" default="10" />
-    <aura:attribute name="articletype" type="String" default="How_To" />
+    <aura:attribute name="articletype" type="String" default="How_To" required="true"/>
+    <aura:attribute name="sortby" type="String" default="Rating" required="true"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
@@ -24,7 +25,7 @@
                     <ul class="itemRows">
                         <li class="tableRowGroup">
                             <div class="forceListRecordItem">
-                                <div class="label">Rating:</div>
+                                <div class="label">Score:</div>
                                 <div class="value">
                                     <div class="rating_bar">
                                         <div class="rating" style="{!'width:'+a.Rating+'%;'}"></div>

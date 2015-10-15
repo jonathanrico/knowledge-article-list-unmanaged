@@ -2,4 +2,5 @@
     <design:attribute name="title" label="List Title" description="Title you want to display for this Knowledge Article List"/>
     <design:attribute name="maxresults" label="Max Results" description="Max # of articles displayed in the component"/>
     <design:attribute name="articletype" label="Article Type" description="API Name of your article type" />
+    <design:attribute name="sortby" datasource="Rating,Views" label="Sort By" description="Criteria used for sorting, can be Rating or View Stats" />
 </design:component>
