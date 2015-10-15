@@ -22,6 +22,7 @@ public with sharing class KnowledgeArticleListCtrl{
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
             String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject+' where Channel = \'AllChannels\'';
+            System.debug('*** filterByLanguage : '+filterByLanguage);
             if(filterByLanguage){
                 soqlVoteStats+= ' and ParentId in (select KnowledgeArticleId from '+articleType+'__kav where PublishStatus=\'online\' and Language = :currentLanguage)';
             }
@@ -55,7 +56,7 @@ public with sharing class KnowledgeArticleListCtrl{
             testObj.put('ArticleType','How_To');
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
-            String soqlKAType = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
+            String soqlKAType = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds and Language = :currentLanguage';
             List<Sobject> kaResults = Database.query(soqlKAType);
             sobjects = sObjectsToMap(kaResults, new Set<String>{'Id','KnowledgeArticleId','Title','ArticleType'});
           }
