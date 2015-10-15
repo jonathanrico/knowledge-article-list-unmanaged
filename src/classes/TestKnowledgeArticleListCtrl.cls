@@ -3,7 +3,7 @@ private class TestKnowledgeArticleListCtrl{
 
     static testMethod void testArticleList(){
         Test.startTest();
-            List<KnowledgeArticleItem> result = KnowledgeArticleListCtrl.getRecords(1,'How_To','Rating');
+            List<KnowledgeArticleItem> result = KnowledgeArticleListCtrl.getRecords(1,'How_To','Rating', false);
             System.assert(result != null);
             System.assert(result.size() == 1);
         Test.stopTest();

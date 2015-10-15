@@ -4,11 +4,13 @@
         var maxresults = isNaN(component.get("v.maxresults"))? 10 : parseInt(component.get("v.maxresults"));
         var articletype = component.get("v.articletype");
         var sorttype = component.get("v.sortby");
+        var filterbylang = component.get("v.filterByLanguage")=="true";
         var a = component.get("c.getRecords");
         a.setParams({
           "maxResults": maxresults,
           "articleType": articletype,
-          "sortByType": sorttype
+          "sortByType": sorttype,
+          "filterByLanguage": filterbylang
         });
         a.setCallback(this, function(response) {
             if (response.getState() === "SUCCESS") {

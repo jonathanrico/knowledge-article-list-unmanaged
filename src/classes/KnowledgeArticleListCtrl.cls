@@ -1,7 +1,7 @@
 public with sharing class KnowledgeArticleListCtrl{
 
     @AuraEnabled
-    public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType, String sortByType){
+    public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType, String sortByType, Boolean filterByLanguage){
 
         List<KnowledgeArticleItem> results = new List<KnowledgeArticleItem>();
         Integer mxr = Integer.valueOf(maxResults);
@@ -12,20 +12,20 @@ public with sharing class KnowledgeArticleListCtrl{
         try{
 
           String statObject = sortByType=='Views'?'ViewStat':'VoteStat';
-
-          //Get ka ids sorted by normalized score
-          String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject;
-          String soqlKAType = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav';
+          String currentLanguage = UserInfo.getLanguage();
 
           if(Test.isRunningTest()){
-            //Create test object
             Map<String,Object> testObj = new Map<String,Object>();
             testObj.put('Id','kA061000000M55dCAC');
             testObj.put('ParentId','kA161000000M55dCAC');
             testObj.put('NormalizedScore',3.0);
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
-            soqlVoteStats+= ' where Channel = \'AllChannels\' order by NormalizedScore desc limit :mxr';
+            String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject+' where Channel = \'AllChannels\'';
+            if(filterByLanguage){
+                soqlVoteStats+= ' and ParentId in (select KnowledgeArticleId from '+articleType+'__kav where PublishStatus=\'online\' and Language = :currentLanguage)';
+            }
+            soqlVoteStats+= ' order by NormalizedScore desc limit :mxr';
             List<Sobject> voteResults = Database.query(soqlVoteStats);
             sobjects = sObjectsToMap(voteResults, new Set<String>{'Id','ParentId','NormalizedScore'});
           }
@@ -48,7 +48,6 @@ public with sharing class KnowledgeArticleListCtrl{
           }
 
           if(Test.isRunningTest()){
-            //Create test object
             Map<String,Object> testObj = new Map<String,Object>();
             testObj.put('Id','kA061000000M55dCAC');
             testObj.put('KnowledgeArticleId','kA161000000M55dCAC');
@@ -56,7 +55,7 @@ public with sharing class KnowledgeArticleListCtrl{
             testObj.put('ArticleType','How_To');
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
-            soqlKAType+= ' where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
+            String soqlKAType = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
             List<Sobject> kaResults = Database.query(soqlKAType);
             sobjects = sObjectsToMap(kaResults, new Set<String>{'Id','KnowledgeArticleId','Title','ArticleType'});
           }

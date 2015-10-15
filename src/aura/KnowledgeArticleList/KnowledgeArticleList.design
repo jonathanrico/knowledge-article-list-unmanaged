@@ -3,4 +3,5 @@
     <design:attribute name="maxresults" label="Max Results" description="Max # of articles displayed in the component"/>
     <design:attribute name="articletype" label="Article Type" description="API Name of your article type" />
     <design:attribute name="sortby" datasource="Rating,Views" label="Sort By" description="Criteria used for sorting, can be Rating or View Stats" />
+    <design:attribute name="filterByLanguage" label="Filter by user language" description="Enable this option to filter articles based on the end user's language" />
 </design:component>

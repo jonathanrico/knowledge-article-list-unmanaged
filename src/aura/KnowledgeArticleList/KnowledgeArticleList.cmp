@@ -5,6 +5,7 @@
     <aura:attribute name="maxresults" type="Integer" default="10" />
     <aura:attribute name="articletype" type="String" default="How_To" required="true"/>
     <aura:attribute name="sortby" type="String" default="Rating" required="true"/>
+    <aura:attribute name="filterByLanguage" type="Boolean" default="false" />
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
