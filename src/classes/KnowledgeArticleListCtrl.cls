@@ -3,6 +3,7 @@ public with sharing class KnowledgeArticleListCtrl{
     @AuraEnabled
     public static List<KnowledgeArticleItem> getRecords(Integer maxResults, String articleType, String sortByType, Boolean filterByLanguage){
 
+        //Auxiliary collections
         List<KnowledgeArticleItem> results = new List<KnowledgeArticleItem>();
         Integer mxr = Integer.valueOf(maxResults);
         List<Id> sortedIds = new List<Id>();
@@ -11,27 +12,37 @@ public with sharing class KnowledgeArticleListCtrl{
 
         try{
 
-          String statObject = sortByType=='Views'?'ViewStat':'VoteStat';
+          //Grab the running user's language code for use in SOQL queries
           String currentLanguage = UserInfo.getLanguage();
 
+          //Set the stat object suffix depending on the sort type
+          String statObject = sortByType=='Views'?'ViewStat':'VoteStat';
+
+
           if(Test.isRunningTest()){
+            //Construct test maps for tests to avoid validation issues with custom articke types
             Map<String,Object> testObj = new Map<String,Object>();
             testObj.put('Id','kA061000000M55dCAC');
             testObj.put('ParentId','kA161000000M55dCAC');
             testObj.put('NormalizedScore',3.0);
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
+            //Start filtering articles based on the article ViewStat or VoteStat objects, always sort by Normalized Score descending
             String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject+' where Channel = \'AllChannels\'';
+
+            //Additional filters if we want to limit results to the current user's language
             if(filterByLanguage){
-                // TODO: Figure out how to filter by language without having to perform this extra query
-                // this could lead to governor limit exceptions with large kbs
+                // TODO: Filter by language without performing an extra query to avoid governor limit exceptions
                 soqlVoteStats+= ' and ParentId in (select KnowledgeArticleId from '+articleType+'__kav where PublishStatus=\'online\' and Language = :currentLanguage)';
             }
             soqlVoteStats+= ' order by NormalizedScore desc limit :mxr';
+
+            //Convert sobjects to maps to make sure we use the same code path as the unit tests
             List<Sobject> voteResults = Database.query(soqlVoteStats);
             sobjects = sObjectsToMap(voteResults, new Set<String>{'Id','ParentId','NormalizedScore'});
           }
 
+          //Create a map of knowledge article items with the current rating (normalized score) information
           for(Map<String,Object> v : sobjects){
               Id kaId = (Id)v.get('ParentId');
               sortedIds.add(kaId);
@@ -49,7 +60,9 @@ public with sharing class KnowledgeArticleListCtrl{
               kavMap.put(kaId, kai);
           }
 
+          //Query for additional knowledge article data for the map entries created in the previous step
           if(Test.isRunningTest()){
+            //Construct test maps for tests to avoid validation issues with custom articke typ
             Map<String,Object> testObj = new Map<String,Object>();
             testObj.put('Id','kA061000000M55dCAC');
             testObj.put('KnowledgeArticleId','kA161000000M55dCAC');
@@ -63,6 +76,7 @@ public with sharing class KnowledgeArticleListCtrl{
             sobjects = sObjectsToMap(kaResults, new Set<String>{'Id','KnowledgeArticleId','Title','ArticleType'});
           }
 
+          //Enrich the map data with additional knowledge article information
           for(Map<String,Object> a : sobjects){
               Id kaId = (String)a.get('KnowledgeArticleId');
               KnowledgeArticleItem kai = kavMap.get(kaId);
@@ -70,12 +84,13 @@ public with sharing class KnowledgeArticleListCtrl{
               kai.Title = (String)a.get('Title');
           }
 
+          //Build a list of knowledge article items using the original sort order provided by the VoteStat or ViewStat queries
           for(Id kavId : sortedIds){
             results.add(kavMap.get(kavId));
           }
 
         }catch(Exception e){
-          //TODO: Handle exception
+          //Handle exception
           System.debug(e);
         }
 
