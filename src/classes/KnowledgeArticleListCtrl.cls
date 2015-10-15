@@ -7,6 +7,7 @@ public with sharing class KnowledgeArticleListCtrl{
         Integer mxr = Integer.valueOf(maxResults);
         List<Id> sortedIds = new List<Id>();
         Map<Id,KnowledgeArticleItem> kavMap = new Map<Id,KnowledgeArticleItem>();
+        List<Map<String,Object>> sobjects = null;
 
         try{
 
@@ -16,74 +17,55 @@ public with sharing class KnowledgeArticleListCtrl{
           String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject;
           String soqlKAType = 'select Id,Title,KnowledgeArticleId,ArticleType from '+articleType+'__kav';
 
-          if(!Test.isRunningTest()){
-
-            soqlVoteStats+= ' where Channel = \'AllChannels\' order by NormalizedScore desc limit :mxr';
-
-            for(Sobject v : Database.query(soqlVoteStats)){
-                Id kaId = (Id)v.get('ParentId');
-                sortedIds.add(kaId);
-                KnowledgeArticleItem kai = new KnowledgeArticleItem();
-                kai.kaId = kaId;
-                Integer articleRating = 0;
-                if(v.get('NormalizedScore') != null){
-                  if(statObject == 'VoteStat'){
-                    articleRating = ((((Decimal)v.get('NormalizedScore'))/5.0)*100.0).intValue();
-                  }else{
-                    articleRating = ((Decimal)v.get('NormalizedScore')).intValue();
-                  }
-                }
-                kai.Rating = articleRating;
-                kavMap.put(kaId, kai);
-            }
-
-            soqlKAType+= ' where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
-
-            for(Sobject a : Database.query(soqlKAType)){
-                Id kaId = (String)a.get('KnowledgeArticleId');
-                KnowledgeArticleItem kai = kavMap.get(kaId);
-                kai.Id = a.Id;
-                kai.Title = (String)a.get('Title');
-            }
-
+          if(Test.isRunningTest()){
+            //Create test object
+            Map<String,Object> testObj = new Map<String,Object>();
+            testObj.put('Id','kA061000000M55dCAC');
+            testObj.put('ParentId','kA161000000M55dCAC');
+            testObj.put('NormalizedScore',3.0);
+            sobjects = new List<Map<String,Object>>{testObj};
           }else{
-                //TODO: Replace with  dynamic knowledge article creation based on existing article types
-                KnowledgeArticleItem kai1 = new KnowledgeArticleItem();
-                kai1.Id = 'kA061000000M55d';
-                kai1.Title = 'Test Article 1 ';
-                kai1.Rating = 1;
-                sortedIds.add('kA161000000M55d');
-                kavMap.put('kA161000000M55d', kai1);
-                KnowledgeArticleItem kai2 = new KnowledgeArticleItem();
-                kai2.Id = 'kA061000000M55e';
-                kai2.Title = 'Test Article 2';
-                kai2.Rating = 2;
-                sortedIds.add('kA161000000M55e');
-                kavMap.put('kA161000000M55e', kai2);
-                KnowledgeArticleItem kai3 = new KnowledgeArticleItem();
-                kai3.Id = 'kA061000000M55f';
-                kai3.Title = 'Test Article 3';
-                kai3.Rating = 3;
-                sortedIds.add('kA161000000M55f');
-                kavMap.put('kA161000000M55f', kai3);
-                KnowledgeArticleItem kai4 = new KnowledgeArticleItem();
-                kai4.Id = 'kA061000000M55g';
-                kai4.Title = 'Test Article 4';
-                kai4.Rating = 4;
-                sortedIds.add('kA161000000M55g');
-                kavMap.put('kA161000000M55g', kai4);
-                KnowledgeArticleItem kai5 = new KnowledgeArticleItem();
-                kai5.Id = 'kA061000000M55h';
-                kai5.Title = 'Test Article 5';
-                kai5.Rating = 5;
-                sortedIds.add('kA161000000M55h');
-                kavMap.put('kA161000000M55h', kai5);
-                KnowledgeArticleItem kai6 = new KnowledgeArticleItem();
-                kai6.Id = 'kA061000000M55i';
-                kai6.Title = 'Test Article 6';
-                kai6.Rating = 0;
-                sortedIds.add('kA161000000M55i');
-                kavMap.put('kA161000000M55i', kai6);
+            soqlVoteStats+= ' where Channel = \'AllChannels\' order by NormalizedScore desc limit :mxr';
+            List<Sobject> voteResults = Database.query(soqlVoteStats);
+            sobjects = sObjectsToMap(voteResults, new Set<String>{'Id','ParentId','NormalizedScore'});
+          }
+
+          for(Map<String,Object> v : sobjects){
+              Id kaId = (Id)v.get('ParentId');
+              sortedIds.add(kaId);
+              KnowledgeArticleItem kai = new KnowledgeArticleItem();
+              kai.kaId = kaId;
+              Integer articleRating = 0;
+              if(v.get('NormalizedScore') != null){
+                if(statObject == 'VoteStat'){
+                  articleRating = ((((Decimal)v.get('NormalizedScore'))/5.0)*100.0).intValue();
+                }else{
+                  articleRating = ((Decimal)v.get('NormalizedScore')).intValue();
+                }
+              }
+              kai.Rating = articleRating;
+              kavMap.put(kaId, kai);
+          }
+
+          if(Test.isRunningTest()){
+            //Create test object
+            Map<String,Object> testObj = new Map<String,Object>();
+            testObj.put('Id','kA061000000M55dCAC');
+            testObj.put('KnowledgeArticleId','kA161000000M55dCAC');
+            testObj.put('Title','Sample Article');
+            testObj.put('ArticleType','How_To');
+            sobjects = new List<Map<String,Object>>{testObj};
+          }else{
+            soqlKAType+= ' where PublishStatus=\'online\' and KnowledgeArticleId in :sortedIds';
+            List<Sobject> kaResults = Database.query(soqlKAType);
+            sobjects = sObjectsToMap(kaResults, new Set<String>{'Id','KnowledgeArticleId','Title','ArticleType'});
+          }
+
+          for(Map<String,Object> a : sobjects){
+              Id kaId = (String)a.get('KnowledgeArticleId');
+              KnowledgeArticleItem kai = kavMap.get(kaId);
+              kai.Id = (String)a.get('Id');
+              kai.Title = (String)a.get('Title');
           }
 
           for(Id kavId : sortedIds){
@@ -94,7 +76,21 @@ public with sharing class KnowledgeArticleListCtrl{
           //TODO: Handle exception
           System.debug(e);
         }
+
         return results;
+    }
+
+    @TestVisible
+    private static List<Map<String,Object>> sObjectsToMap(List<SObject> sobjects, Set<String> fields){
+        List<Map<String,Object>> result = new List<Map<String,Object>>();
+        for(SObject so : sobjects){
+            Map<String,Object> soMap = new Map<String,Object>();
+            for(String f : fields){
+                soMap.put(f, so.get(f));
+            }
+            result.add(soMap);
+        }
+        return result;
     }
 
 }
