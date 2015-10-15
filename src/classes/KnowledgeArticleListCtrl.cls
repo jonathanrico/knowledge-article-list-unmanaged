@@ -22,7 +22,6 @@ public with sharing class KnowledgeArticleListCtrl{
             sobjects = new List<Map<String,Object>>{testObj};
           }else{
             String soqlVoteStats = 'select Id, ParentId, NormalizedScore from '+articleType+'__'+statObject+' where Channel = \'AllChannels\'';
-            System.debug('*** filterByLanguage : '+filterByLanguage);
             if(filterByLanguage){
                 soqlVoteStats+= ' and ParentId in (select KnowledgeArticleId from '+articleType+'__kav where PublishStatus=\'online\' and Language = :currentLanguage)';
             }
